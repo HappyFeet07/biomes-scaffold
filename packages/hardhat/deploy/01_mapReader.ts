@@ -1,0 +1,59 @@
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+import { garnet, redstone } from "@latticexyz/common/chains";
+
+const BIOMES_MAINNET_WORLD_ADDRESS = "0xf75b1b7bdb6932e487c4aa8d210f4a682abeacf0";
+const BIOMES_TESTNET_WORLD_ADDRESS = "0x641554ed9d8a6c2c362e6c3fb2835ec2ca4da95c";
+
+/**
+ * Deploys a contract named "Game" using the deployer account and
+ * constructor arguments set to the deployer address
+ *
+ * @param hre HardhatRuntimeEnvironment object.
+ */
+const deployMapReaderContract: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  /*
+    On localhost, the deployer account is the one that comes with Hardhat, which is already funded.
+
+    When deploying to live networks (e.g `yarn deploy --network sepolia`), the deployer account
+    should have sufficient balance to pay for the gas fees for contract creation.
+
+    You can generate a random account with `yarn generate` which will fill DEPLOYER_PRIVATE_KEY
+    with a random private key in the .env file (then used on hardhat.config.ts)
+    You can run the `yarn account` command to check your balance in every network.
+  */
+  const { deployer } = await hre.getNamedAccounts();
+  const { deploy } = hre.deployments;
+
+  const chainId = await hre.getChainId();
+
+  const useBiomesWorldAddress =
+    Number(chainId) === redstone.id
+      ? BIOMES_MAINNET_WORLD_ADDRESS
+      : Number(chainId) === garnet.id
+      ? BIOMES_TESTNET_WORLD_ADDRESS
+      : "";
+  if (useBiomesWorldAddress === "") {
+    throw new Error("Biomes World Address not found for this chain");
+  }
+  console.log("useBiomesWorldAddress", useBiomesWorldAddress);
+
+  const deployedContract = await deploy("MapReader", {
+    from: deployer,
+    // Contract constructor arguments
+    args: [useBiomesWorldAddress],
+    log: true,
+    // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
+    // automatically mining the contract deployment transaction. There is no effect on live networks.
+    autoMine: true,
+  });
+
+  // Get the deployed contract to interact with it after deploying.
+  console.log("deployedContract", deployedContract.address);
+};
+
+export default deployMapReaderContract;
+
+// Tags are useful if you have multiple deploy files and only want to run one of them.
+// e.g. yarn deploy --tags Game
+deployMapReaderContract.tags = ["MapReader"];

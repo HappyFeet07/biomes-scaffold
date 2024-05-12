@@ -134,6 +134,16 @@ const config: HardhatUserConfig = {
   // configuration for harhdat-verify plugin
   etherscan: {
     apiKey: `${etherscanApiKey}`,
+    customChains: [
+      {
+        network: "garnet",
+        chainId: 17069,
+        urls: {
+          apiURL: "https://api-goerli.etherscan.io/api",
+          browserURL: "https://goerli.etherscan.io",
+        },
+      },
+    ],
   },
   // configuration for etherscan-verify from hardhat-deploy plugin
   verify: {
