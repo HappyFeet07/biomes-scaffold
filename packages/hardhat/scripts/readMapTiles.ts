@@ -12,7 +12,7 @@ const increaseY = (ori: AreaStruct, i: number): AreaStruct => {
     ...ori,
     lowerSouthwestCorner: {
       ...ori.lowerSouthwestCorner,
-      y: BigInt(ori.lowerSouthwestCorner.y) + BigInt(i),
+      y: BigInt(ori.lowerSouthwestCorner.y) - BigInt(i),
     },
   };
 };
@@ -23,14 +23,14 @@ interface FindingResult {
   Result: VoxelCoordStruct[];
 }
 
-const main = async () => {
+export const scan = async (player: string, objectType: number[]) => {
+  const provider = new ethers.JsonRpcProvider("https://rpc.garnetchain.com");
+  const signer = new ethers.Wallet("Your private key", provider);
   const readerAddress = "0xa134Eb3717AE07bEDdEf29cF0bbdA7E5657871F9";
-  const mapReader = (await ethers.getContractAt("MapReader", readerAddress)) as MapReader;
-  const player = "0x9C179d698ddb0f9BEE55d223AE7D354597a8F877";
-  const objectType = [37, 117, 119];
-
+  const mapReader = (await ethers.getContractAt("MapReader", readerAddress, signer)) as MapReader;
   const result = await findOres(mapReader, player, objectType);
-  console.log(result[1]);
+
+  return result;
 };
 
 const getVoxelFromResult = (result: Array<any>) => {
@@ -55,7 +55,7 @@ const findOre = async (reader: MapReader, playerLocation: VoxelCoordStruct, obje
   const leftBottom: AreaStruct = {
     lowerSouthwestCorner: {
       x: BigInt(playerLocation.x) - 5n,
-      y: BigInt(playerLocation.y) - 5n,
+      y: BigInt(playerLocation.y),
       z: BigInt(playerLocation.z) - 5n,
     },
     size: { x: 11n, y: 1n, z: 11n },
@@ -81,5 +81,3 @@ const findOre = async (reader: MapReader, playerLocation: VoxelCoordStruct, obje
   });
   return oreFound;
 };
-
-main().then();

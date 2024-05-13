@@ -14,11 +14,27 @@ import { OptionalSystemHooks } from "@latticexyz/world/src/codegen/tables/Option
 
 import { IWorld } from "@biomesaw/world/src/codegen/world/IWorld.sol";
 import { VoxelCoord } from "@biomesaw/utils/src/Types.sol";
+import { getEntityFromPlayer, getPosition } from "../utils/EntityUtils.sol";
 
 contract Game is ICustomUnregisterDelegation, IOptionalSystemHook {
-  address public immutable biomeWorldAddress;
 
+  ResourceId MoveSystemId = WorldResourceIdLib.encode({ typeId: RESOURCE_SYSTEM, namespace: "", name: "MoveSystem" });
+
+  struct Area {
+    VoxelCoord lowerSouthwestCorner;
+    VoxelCoord size;
+  }
+ 
+  struct NamedArea {
+    string name;
+    Area area;
+  }
+
+  address public immutable biomeWorldAddress;
   address public delegatorAddress;
+  mapping(address => mapping(uint8 => bool)) public playerObjectTypes;
+  mapping(address => NamedArea[]) public foundAreas;
+  uint256 constant public max = 30;
 
   constructor(address _biomeWorldAddress, address _delegatorAddress) {
     biomeWorldAddress = _biomeWorldAddress;
@@ -44,8 +60,20 @@ contract Game is ICustomUnregisterDelegation, IOptionalSystemHook {
       interfaceId == type(IERC165).interfaceId;
   }
 
+  function setPlayerObjectTypes(address player, uint8[] memory objectTypes) external {
+    for (uint256 i = 0; i < objectTypes.length; i++) {
+      playerObjectTypes[player][objectTypes[i]] = !playerObjectTypes[player][objectTypes[i]];
+    }
+  }
+
   function canUnregister(address delegator) external override onlyBiomeWorld returns (bool) {
     return true;
+  }
+
+  function registerMapReader(uint8[] memory objectTypes) external {
+    for (uint256 i = 0; i < objectTypes.length; i++) {
+      playerObjectTypes[msg.sender][objectTypes[i]] = true;
+    }
   }
 
   function onRegisterHook(
@@ -60,7 +88,8 @@ contract Game is ICustomUnregisterDelegation, IOptionalSystemHook {
     ResourceId systemId,
     uint8 enabledHooksBitmap,
     bytes32 callDataHash
-  ) external override onlyBiomeWorld {}
+  ) external override onlyBiomeWorld {
+  }
 
   function onBeforeCallSystem(
     address msgSender,
@@ -72,10 +101,51 @@ contract Game is ICustomUnregisterDelegation, IOptionalSystemHook {
     address msgSender,
     ResourceId systemId,
     bytes memory callData
-  ) external override onlyBiomeWorld {}
+  ) external override onlyBiomeWorld {
+    if (ResourceId.unwrap(systemId) == ResourceId.unwrap(MoveSystemId)) {
+      VoxelCoord memory playerPosition = getPosition(getEntityFromPlayer(msgSender));
+      playerPosition.x = playerPosition.x - 5;
+      playerPosition.y = playerPosition.y - 5; 
+      playerPosition.z = playerPosition.z - 5; 
+      Area memory area = Area(playerPosition, VoxelCoord(10, 10, 10));
+      _findTargetInArea(msgSender, area);
+    }
+  }
+
+  function getDisplayName() external pure returns (string memory) {
+    return "Ore Seeker";
+  }
+
+
+  function _findTargetInArea(address player, Area memory area) internal {
+    VoxelCoord memory lowerSouthwestCorner = area.lowerSouthwestCorner;
+    VoxelCoord memory size = area.size;
+    delete foundAreas[player];
+
+    for (int16 x = lowerSouthwestCorner.x; x < lowerSouthwestCorner.x + size.x; x++) {
+      for (int16 y = lowerSouthwestCorner.y; y < lowerSouthwestCorner.y + size.y; y++) {
+        for (int16 z = lowerSouthwestCorner.z; z < lowerSouthwestCorner.z + size.z; z++) {
+          uint8 typeId = IWorld(biomeWorldAddress).getTerrainObjectTypeId(VoxelCoord(x, y, z));
+          if (playerObjectTypes[player][typeId] == true) {
+            Area memory foundArea = Area(VoxelCoord(x, y, z), VoxelCoord(1, 250, 1));
+            NamedArea memory namedArea = NamedArea("Found Area", foundArea);
+            foundAreas[player].push(namedArea);
+          }
+        }
+      }
+    }
+  }
+
+  function getAreas() external view returns (NamedArea[] memory) {
+    return 
+  }
 
   function basicGetter() external view returns (uint256) {
     return 42;
+  }
+
+  function getUserAreas(address player) external view returns (NamedArea[] memory) {
+    return foundAreas[player];
   }
 
   function getRegisteredPlayers() external view returns (address[] memory) {
