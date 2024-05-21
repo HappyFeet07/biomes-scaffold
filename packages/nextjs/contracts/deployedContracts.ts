@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   17069: {
     Game: {
-      address: "0x7d01f3f79242A37C81380bbcd734F6A93Ecbc370",
+      address: "0x9237E4D31a82709Aeb1Bf97082f85E385161F74F",
       abi: [
         {
           inputs: [
@@ -24,6 +24,24 @@ const deployedContracts = {
           ],
           stateMutability: "nonpayable",
           type: "constructor",
+        },
+        {
+          inputs: [],
+          name: "NotGameOwner",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "MAX_RETURN_LENGTH",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
         },
         {
           inputs: [],
@@ -72,6 +90,55 @@ const deployedContracts = {
         },
         {
           inputs: [],
+          name: "checkRegistered",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "counter",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "defaultSearchSize",
+          outputs: [
+            {
+              internalType: "int16",
+              name: "x",
+              type: "int16",
+            },
+            {
+              internalType: "int16",
+              name: "y",
+              type: "int16",
+            },
+            {
+              internalType: "int16",
+              name: "z",
+              type: "int16",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
           name: "delegatorAddress",
           outputs: [
             {
@@ -84,6 +151,178 @@ const deployedContracts = {
           type: "function",
         },
         {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "foundAreas",
+          outputs: [
+            {
+              internalType: "string",
+              name: "name",
+              type: "string",
+            },
+            {
+              components: [
+                {
+                  components: [
+                    {
+                      internalType: "int16",
+                      name: "x",
+                      type: "int16",
+                    },
+                    {
+                      internalType: "int16",
+                      name: "y",
+                      type: "int16",
+                    },
+                    {
+                      internalType: "int16",
+                      name: "z",
+                      type: "int16",
+                    },
+                  ],
+                  internalType: "struct VoxelCoord",
+                  name: "lowerSouthwestCorner",
+                  type: "tuple",
+                },
+                {
+                  components: [
+                    {
+                      internalType: "int16",
+                      name: "x",
+                      type: "int16",
+                    },
+                    {
+                      internalType: "int16",
+                      name: "y",
+                      type: "int16",
+                    },
+                    {
+                      internalType: "int16",
+                      name: "z",
+                      type: "int16",
+                    },
+                  ],
+                  internalType: "struct VoxelCoord",
+                  name: "size",
+                  type: "tuple",
+                },
+              ],
+              internalType: "struct Game.Area",
+              name: "area",
+              type: "tuple",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "gameOwner",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getAreas",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "string",
+                  name: "name",
+                  type: "string",
+                },
+                {
+                  components: [
+                    {
+                      components: [
+                        {
+                          internalType: "int16",
+                          name: "x",
+                          type: "int16",
+                        },
+                        {
+                          internalType: "int16",
+                          name: "y",
+                          type: "int16",
+                        },
+                        {
+                          internalType: "int16",
+                          name: "z",
+                          type: "int16",
+                        },
+                      ],
+                      internalType: "struct VoxelCoord",
+                      name: "lowerSouthwestCorner",
+                      type: "tuple",
+                    },
+                    {
+                      components: [
+                        {
+                          internalType: "int16",
+                          name: "x",
+                          type: "int16",
+                        },
+                        {
+                          internalType: "int16",
+                          name: "y",
+                          type: "int16",
+                        },
+                        {
+                          internalType: "int16",
+                          name: "z",
+                          type: "int16",
+                        },
+                      ],
+                      internalType: "struct VoxelCoord",
+                      name: "size",
+                      type: "tuple",
+                    },
+                  ],
+                  internalType: "struct Game.Area",
+                  name: "area",
+                  type: "tuple",
+                },
+              ],
+              internalType: "struct Game.NamedArea[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getDisplayName",
+          outputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          stateMutability: "pure",
+          type: "function",
+        },
+        {
           inputs: [],
           name: "getRegisteredPlayers",
           outputs: [
@@ -91,6 +330,44 @@ const deployedContracts = {
               internalType: "address[]",
               name: "",
               type: "address[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "initItems",
+          outputs: [
+            {
+              internalType: "uint8",
+              name: "",
+              type: "uint8",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "inited",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
             },
           ],
           stateMutability: "view",
@@ -201,6 +478,154 @@ const deployedContracts = {
         {
           inputs: [
             {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+            {
+              internalType: "uint8",
+              name: "",
+              type: "uint8",
+            },
+          ],
+          name: "playerObjectTypes",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "playerSearchSize",
+          outputs: [
+            {
+              internalType: "int16",
+              name: "x",
+              type: "int16",
+            },
+            {
+              internalType: "int16",
+              name: "y",
+              type: "int16",
+            },
+            {
+              internalType: "int16",
+              name: "z",
+              type: "int16",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "players",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "register",
+          outputs: [],
+          stateMutability: "payable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "registerPrice",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint8[]",
+              name: "objectTypes",
+              type: "uint8[]",
+            },
+          ],
+          name: "setPlayerObjectTypes",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "int16",
+                  name: "x",
+                  type: "int16",
+                },
+                {
+                  internalType: "int16",
+                  name: "y",
+                  type: "int16",
+                },
+                {
+                  internalType: "int16",
+                  name: "z",
+                  type: "int16",
+                },
+              ],
+              internalType: "struct VoxelCoord",
+              name: "_searchSize",
+              type: "tuple",
+            },
+          ],
+          name: "setPlayerSearchSize",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "price",
+              type: "uint256",
+            },
+          ],
+          name: "setRegisterPrice",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
               internalType: "bytes4",
               name: "interfaceId",
               type: "bytes4",
@@ -215,6 +640,13 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "withdrawEth",
+          outputs: [],
+          stateMutability: "nonpayable",
           type: "function",
         },
       ],

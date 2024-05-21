@@ -29,7 +29,7 @@ export const RegisterGame: React.FC = ({}) => {
       address: deployedContractData.address,
       abi: deployedContractData.abi,
       functionName: "getRegisteredPlayers",
-      args: undefined,
+      args: [],
     });
     if (!Array.isArray(registeredPlayers)) {
       return;
@@ -72,7 +72,7 @@ export const RegisterGame: React.FC = ({}) => {
     })
     .sort((a, b) => (b.inheritedFrom ? b.inheritedFrom.localeCompare(a.inheritedFrom) : 1));
 
-  const registerPlayFunctionData = writeFunctions.find(fn => fn.fn.name === "registerPlayer");
+  const registerPlayFunctionData = writeFunctions.find(fn => fn.fn.name === "register");
 
   const viewFunctions = ((deployedContractData?.abi as Abi).filter(part => part.type === "function") as AbiFunction[])
     .filter(fn => {
@@ -109,7 +109,7 @@ export const RegisterGame: React.FC = ({}) => {
                       contractAddress={deployedContractData.address}
                       abi={deployedContractData.abi as Abi}
                       functionName={registerPlayFunctionData.fn.name}
-                      value={"0.0015"}
+                      value={"0.001"}
                       onWrite={(txnReceipt: TransactionReceipt) => {
                         console.log("txnReceipt", txnReceipt);
                         checkPlayerRegistered();

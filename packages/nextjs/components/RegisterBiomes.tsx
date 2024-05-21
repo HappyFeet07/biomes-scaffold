@@ -1,15 +1,56 @@
 import { useEffect, useState } from "react";
-import { CardSection } from "./Card";
+import coal_ore_Icon from "../public/ores/coel_ore_lcon.svg";
+import diamond_ore_Icon from "../public/ores/diamond_ore_icon.svg";
+import gold_ore_Icon from "../public/ores/gold_ore_icon.svg";
+import mushroom_Icon from "../public/ores/mushroom_icon.svg";
+import neptunium_ore_Icon from "../public/ores/neptunium_ore_icon.svg";
+import silver_ore_Icon from "../public/ores/silver_ore_icon.svg";
+import { CardSection, SelectingField } from "./Card";
+import { SubmitSelect } from "./FunctionalButtons";
+import { ObjectIdSelected } from "./ObjectIdSelected";
 import { BEFORE_AND_AFTER_CALL_SYSTEM, RegisterDelegationButton, RegisterHookButton } from "./RegisterButtons";
 import { useAccount, usePublicClient } from "wagmi";
+import {
+  COAL_ORE_OBJECT_ID,
+  DIAMOND_ORE_OBJECT_ID,
+  GOLD_ORE_OBJECT_ID,
+  NEPTUNIUM_ORE_OBJECT_ID,
+  RED_MUSHROOM_OBJECT_ID,
+  SILVER_ORE_OBJECT_ID,
+} from "~~/components/ObjectTypeIds";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { useGlobalState } from "~~/services/store/store";
 import { getAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
+interface CheckboxItem {
+  id: number;
+  checked: boolean;
+  img: string;
+  alt: string;
+}
+
+const supportedObjectIds = [
+  COAL_ORE_OBJECT_ID,
+  GOLD_ORE_OBJECT_ID,
+  SILVER_ORE_OBJECT_ID,
+  DIAMOND_ORE_OBJECT_ID,
+  NEPTUNIUM_ORE_OBJECT_ID,
+  RED_MUSHROOM_OBJECT_ID,
+];
+
+const checkboxItems: CheckboxItem[] = [
+  { id: COAL_ORE_OBJECT_ID, checked: false, img: coal_ore_Icon, alt: "Coal" },
+  { id: GOLD_ORE_OBJECT_ID, checked: false, img: gold_ore_Icon, alt: "Gold" },
+  { id: SILVER_ORE_OBJECT_ID, checked: false, img: silver_ore_Icon, alt: "Silver" },
+  { id: DIAMOND_ORE_OBJECT_ID, checked: false, img: diamond_ore_Icon, alt: "Diamond" },
+  { id: NEPTUNIUM_ORE_OBJECT_ID, checked: false, img: neptunium_ore_Icon, alt: "Neptunium" },
+  { id: RED_MUSHROOM_OBJECT_ID, checked: false, img: mushroom_Icon, alt: "Mushroom" },
+];
+
 const contractsData = getAllContracts();
 
-const GameRequiredHooks: string[] = ["LogoffSystem"];
+const GameRequiredHooks: string[] = ["LogoffSystem", "MoveSystem"];
 
 export const RegisterBiomes: React.FC = ({}) => {
   const { address: connectedAddress } = useAccount();
@@ -22,6 +63,42 @@ export const RegisterBiomes: React.FC = ({}) => {
   const [hooksRegistered, setHooksRegistered] = useState(false);
   const [delegationRegistered, setDelegationRegistered] = useState(false);
   const [isDelegatorAddress, setIsDelegatorAddress] = useState(false);
+
+  const [checkedItems, setCheckedItems] = useState<CheckboxItem[]>(checkboxItems);
+  const [snapshot, setSnapshot] = useState<CheckboxItem[]>(checkboxItems);
+  const [isReadComplete, setIsReadComplete] = useState(false);
+
+  const handleChange = (objectId: number) => {
+    const newCheckedItems = checkedItems.map(item =>
+      item.id === objectId ? { ...item, checked: !item.checked } : item,
+    );
+    setCheckedItems(newCheckedItems);
+  };
+
+  const readPlayerSearching = async () => {
+    if (connectedAddress === undefined || deployedContractData === undefined || deployedContractLoading) {
+      return;
+    }
+    if (!publicClient) return;
+
+    const temp = checkedItems;
+    for (let i = 0; i < supportedObjectIds.length; i++) {
+      const supports = await publicClient.readContract({
+        address: deployedContractData?.address,
+        abi: deployedContractData?.abi,
+        functionName: "playerObjectTypes",
+        args: [connectedAddress, supportedObjectIds[i]],
+      });
+      if (supports === false) {
+        temp[i].checked = false;
+      } else {
+        temp[i].checked = true;
+      }
+    }
+    setCheckedItems(temp);
+    setSnapshot(temp);
+    setIsReadComplete(true);
+  };
 
   const checkDelegatorAddress = async () => {
     if (connectedAddress === undefined || deployedContractData === undefined || deployedContractLoading) {
@@ -60,6 +137,7 @@ export const RegisterBiomes: React.FC = ({}) => {
         setDelegationRegistered(true);
       }
     }
+    readPlayerSearching();
   }, [connectedAddress, deployedContractData]);
 
   useEffect(() => {
@@ -99,6 +177,21 @@ export const RegisterBiomes: React.FC = ({}) => {
                   setHooksRegistered={setHooksRegistered}
                 />
               </CardSection>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-left mt-8">CONFIGS</h3>
+              <SelectingField topic={"IN SEARCH"} description={"Selected materials to search for:"}>
+                {isReadComplete && (
+                  <ObjectIdSelected onChange={handleChange} checkedItems={checkedItems}>
+                    {" "}
+                  </ObjectIdSelected>
+                )}
+                <SubmitSelect
+                  hookAddress={deployedContractData?.address}
+                  snapshot={snapshot}
+                  objectIds={checkedItems}
+                ></SubmitSelect>
+              </SelectingField>
             </div>
             {deployedContractData.abi.some(abi => abi.name === "delegatorAddress") && isDelegatorAddress && (
               <div className="pt-4">

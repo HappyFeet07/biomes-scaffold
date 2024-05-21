@@ -1,6 +1,9 @@
 import React from "react";
+import { SubmitSelect } from "./FunctionalButtons";
+import { ObjectIdSelected } from "./ObjectIdSelected";
 
 interface CardSectionProps {
+  topic: string;
   description: string;
   relevantSystems?: string[];
   children: React.ReactNode;
@@ -36,6 +39,39 @@ export const CardSection: React.FC<CardSectionProps> = ({ description, relevantS
               {child}
             </div>
           ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const SelectingField: React.FC<CardSectionProps> = ({ relevantSystems, children }) => {
+  return (
+    <div className="px-4 pt-2 pb-4 mt-4" style={{ backgroundColor: "#160b21", border: "1px solid #0e0715" }}>
+      <div className="grid grid-cols-12 gap-4">
+        <div className="col-span-8 text-left">
+          {React.Children.map(children, (child, index) => {
+            if (React.isValidElement(child) && child.type === ObjectIdSelected) {
+              return (
+                <div key={index} className="my-1">
+                  {" "}
+                  {child}{" "}
+                </div>
+              );
+            }
+          })}
+        </div>
+        <div className={"flex flex-col items-end justify-top " + (relevantSystems ? "col-span-2" : "col-span-4")}>
+          {React.Children.map(children, (child, index) => {
+            if (React.isValidElement(child) && child.type === SubmitSelect) {
+              return (
+                <div key={index} className="my-2">
+                  {" "}
+                  {child}{" "}
+                </div>
+              );
+            }
+          })}
         </div>
       </div>
     </div>
