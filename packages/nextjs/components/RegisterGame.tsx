@@ -1,10 +1,4 @@
 import { useEffect, useReducer, useState } from "react";
-import coal_ore_Icon from "../public/ores/coel_ore_lcon.svg";
-import diamond_ore_Icon from "../public/ores/diamond_ore_icon.svg";
-import gold_ore_Icon from "../public/ores/gold_ore_icon.svg";
-import mushroom_Icon from "../public/ores/mushroom_icon.svg";
-import neptunium_ore_Icon from "../public/ores/neptunium_ore_icon.svg";
-import silver_ore_Icon from "../public/ores/silver_ore_icon.svg";
 import { SelectingField } from "./Card";
 import { ObjectIdSelected } from "./ObjectIdSelected";
 import { Abi, AbiFunction } from "abitype";
@@ -20,6 +14,12 @@ import {
   RED_MUSHROOM_OBJECT_ID,
   SILVER_ORE_OBJECT_ID,
 } from "~~/components/ObjectTypeIds";
+import coal_ore_Icon from "~~/components/assets/coel_ore_lcon.svg";
+import diamond_ore_Icon from "~~/components/assets/diamond_ore_icon.svg";
+import gold_ore_Icon from "~~/components/assets/gold_ore_icon.svg";
+import mushroom_Icon from "~~/components/assets/mushroom_icon.svg";
+import neptunium_ore_Icon from "~~/components/assets/neptunium_ore_icon.svg";
+import silver_ore_Icon from "~~/components/assets/silver_ore_icon.svg";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { useGlobalState } from "~~/services/store/store";

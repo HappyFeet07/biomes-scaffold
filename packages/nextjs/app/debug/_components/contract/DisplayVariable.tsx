@@ -8,7 +8,6 @@ import {
   areValidBuildsWithPos,
   isAreaArray,
   isArrayofBytes32,
-  isBytes32,
   isValidArea,
   isValidBuild,
   isValidBuildWithPos,
@@ -155,7 +154,6 @@ export const DisplayVariable = ({
   const CopyButton =
     isValidArea(result) ||
     isAreaArray(result) ||
-    isBytes32(result) ||
     isArrayofBytes32(result) ||
     isValidBuild(result) ||
     isValidBuildWithPos(result) ||
