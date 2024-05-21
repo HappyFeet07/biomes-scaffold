@@ -87,6 +87,7 @@ export const RegisterBiomes: React.FC = ({}) => {
             <div>
               <h3 className="text-xl font-bold text-left mt-8">HOOKS</h3>
               <CardSection
+                topic={""}
                 relevantSystems={GameRequiredHooks}
                 description={"Description of why you need the player to register the hooks on LogoffSystem"}
               >
@@ -103,7 +104,7 @@ export const RegisterBiomes: React.FC = ({}) => {
             {deployedContractData.abi.some(abi => abi.name === "delegatorAddress") && isDelegatorAddress && (
               <div className="pt-4">
                 <h3 className="text-xl font-bold text-left">DELEGATIONS</h3>
-                <CardSection description={"Delegate unlimited access to the Game contract"}>
+                <CardSection topic={""} description={"Delegate unlimited access to the Game contract"}>
                   <RegisterDelegationButton
                     delegateeAddress={contractsData["Game"].address}
                     playerAddress={connectedAddress}
