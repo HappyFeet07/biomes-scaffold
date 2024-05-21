@@ -35,7 +35,7 @@ contract Game is ICustomUnregisterDelegation, IOptionalSystemHook {
   address public delegatorAddress;
   address public gameOwner;
   uint256 public counter = 0;
-  uint256 public registerPrice = 0 ether;
+  // uint256 public registerPrice = 0 ether;
   VoxelCoord public defaultSearchSize = VoxelCoord(5, 7, 5);
 
   mapping(address => bool) public inited;
@@ -91,20 +91,24 @@ contract Game is ICustomUnregisterDelegation, IOptionalSystemHook {
       interfaceId == type(IERC165).interfaceId;
   }
 
+  // function register() external payable {
+  //   require(msg.value >= registerPrice, "Not enough ether");
+  //   require(!inited[msg.sender], "Already registered");
+  //   inited[msg.sender] = true;
+  //   playerSearchSize[msg.sender] = defaultSearchSize;
+  //   _togglePlayerTargetObject(msg.sender, initItems);
+  // }
 
-  function register() external payable {
-    require(msg.value >= registerPrice, "Not enough ether");
-    require(!inited[msg.sender], "Already registered");
-    inited[msg.sender] = true;
-    playerSearchSize[msg.sender] = defaultSearchSize;
-    _togglePlayerTargetObject(msg.sender, initItems);
-  }
-
-  function setRegisterPrice(uint256 price) external onlyOwner {
-    registerPrice = price;
-  }
+  // function setRegisterPrice(uint256 price) external onlyOwner {
+  //   registerPrice = price;
+  // }
 
   function setPlayerObjectTypes(uint8[] memory objectTypes) external {
+    if (!inited[msg.sender]) {
+      inited[msg.sender] = true;
+      playerSearchSize[msg.sender] = defaultSearchSize;
+      players.push(msg.sender);
+    }
     _togglePlayerTargetObject(msg.sender, objectTypes);
   }
 

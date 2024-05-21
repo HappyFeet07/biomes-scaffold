@@ -1,13 +1,54 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
+import coal_ore_Icon from "../public/ores/coel_ore_lcon.svg";
+import diamond_ore_Icon from "../public/ores/diamond_ore_icon.svg";
+import gold_ore_Icon from "../public/ores/gold_ore_icon.svg";
+import mushroom_Icon from "../public/ores/mushroom_icon.svg";
+import neptunium_ore_Icon from "../public/ores/neptunium_ore_icon.svg";
+import silver_ore_Icon from "../public/ores/silver_ore_icon.svg";
+import { SelectingField } from "./Card";
+import { ObjectIdSelected } from "./ObjectIdSelected";
 import { Abi, AbiFunction } from "abitype";
 import { TransactionReceipt } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 import { DisplayVariable, displayTxResult } from "~~/app/debug/_components/contract";
 import { SendEthButton } from "~~/app/debug/_components/contract/SendEthButton";
+import {
+  COAL_ORE_OBJECT_ID,
+  DIAMOND_ORE_OBJECT_ID,
+  GOLD_ORE_OBJECT_ID,
+  NEPTUNIUM_ORE_OBJECT_ID,
+  RED_MUSHROOM_OBJECT_ID,
+  SILVER_ORE_OBJECT_ID,
+} from "~~/components/ObjectTypeIds";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { useGlobalState } from "~~/services/store/store";
 import { GenericContract, InheritedFunctions } from "~~/utils/scaffold-eth/contract";
+
+interface CheckboxItem {
+  id: number;
+  checked: boolean;
+  img: string;
+  alt: string;
+}
+
+const supportedObjectIds = [
+  COAL_ORE_OBJECT_ID,
+  GOLD_ORE_OBJECT_ID,
+  SILVER_ORE_OBJECT_ID,
+  DIAMOND_ORE_OBJECT_ID,
+  NEPTUNIUM_ORE_OBJECT_ID,
+  RED_MUSHROOM_OBJECT_ID,
+];
+
+const checkboxItems: CheckboxItem[] = [
+  { id: COAL_ORE_OBJECT_ID, checked: false, img: coal_ore_Icon, alt: "Coal" },
+  { id: GOLD_ORE_OBJECT_ID, checked: false, img: gold_ore_Icon, alt: "Gold" },
+  { id: SILVER_ORE_OBJECT_ID, checked: false, img: silver_ore_Icon, alt: "Silver" },
+  { id: DIAMOND_ORE_OBJECT_ID, checked: false, img: diamond_ore_Icon, alt: "Diamond" },
+  { id: NEPTUNIUM_ORE_OBJECT_ID, checked: false, img: neptunium_ore_Icon, alt: "Neptunium" },
+  { id: RED_MUSHROOM_OBJECT_ID, checked: false, img: mushroom_Icon, alt: "Mushroom" },
+];
 
 export const RegisterGame: React.FC = ({}) => {
   const { address: connectedAddress } = useAccount();
@@ -17,6 +58,42 @@ export const RegisterGame: React.FC = ({}) => {
   const { targetNetwork } = useTargetNetwork();
   const publicClient = usePublicClient({ chainId: targetNetwork.id });
   const [refreshDisplayVariables] = useReducer(value => !value, false);
+
+  const [checkedItems, setCheckedItems] = useState<CheckboxItem[]>(checkboxItems);
+  const [snapshot, setSnapshot] = useState<CheckboxItem[]>(checkboxItems);
+  const [isReadComplete, setIsReadComplete] = useState(false);
+
+  const handleChange = (objectId: number) => {
+    const newCheckedItems = checkedItems.map(item =>
+      item.id === objectId ? { ...item, checked: !item.checked } : item,
+    );
+    setCheckedItems(newCheckedItems);
+  };
+
+  const readPlayerSearching = async () => {
+    if (connectedAddress === undefined || deployedContractData === undefined || deployedContractLoading) {
+      return;
+    }
+    if (!publicClient) return;
+
+    const temp = checkedItems;
+    for (let i = 0; i < supportedObjectIds.length; i++) {
+      const supports = await publicClient.readContract({
+        address: deployedContractData?.address,
+        abi: deployedContractData?.abi,
+        functionName: "playerObjectTypes",
+        args: [connectedAddress, supportedObjectIds[i]],
+      });
+      if (supports === false) {
+        temp[i].checked = false;
+      } else {
+        temp[i].checked = true;
+      }
+    }
+    setCheckedItems(temp);
+    setSnapshot(temp);
+    setIsReadComplete(true);
+  };
 
   const checkPlayerRegistered = async () => {
     if (connectedAddress === undefined || deployedContractData === undefined || deployedContractLoading) {
@@ -34,14 +111,12 @@ export const RegisterGame: React.FC = ({}) => {
     if (!Array.isArray(registeredPlayers)) {
       return;
     }
-    const isPlayerRegistered = registeredPlayers.some(
-      playerAddress => playerAddress.toLowerCase() === connectedAddress.toLowerCase(),
-    );
-    setIsGameRegistered(isPlayerRegistered);
+    setIsGameRegistered(false);
   };
 
   useEffect(() => {
     checkPlayerRegistered();
+    readPlayerSearching();
   }, [connectedAddress, deployedContractData, deployedContractLoading]);
 
   if (connectedAddress === undefined) {
@@ -72,7 +147,7 @@ export const RegisterGame: React.FC = ({}) => {
     })
     .sort((a, b) => (b.inheritedFrom ? b.inheritedFrom.localeCompare(a.inheritedFrom) : 1));
 
-  const registerPlayFunctionData = writeFunctions.find(fn => fn.fn.name === "register");
+  const registerPlayFunctionData = writeFunctions.find(fn => fn.fn.name === "setPlayerObjectTypes");
 
   const viewFunctions = ((deployedContractData?.abi as Abi).filter(part => part.type === "function") as AbiFunction[])
     .filter(fn => {
@@ -104,12 +179,21 @@ export const RegisterGame: React.FC = ({}) => {
             <div>
               {!isGameRegistered ? (
                 <div>
+                  <h3 className="text-xl font-bold text-left mt-8">CONFIGS</h3>
+                  <SelectingField topic={"IN SEARCH"} description={"Selected materials to search for:"}>
+                    {isReadComplete && (
+                      <ObjectIdSelected onChange={handleChange} checkedItems={checkedItems}>
+                        {" "}
+                      </ObjectIdSelected>
+                    )}
+                  </SelectingField>
                   {registerPlayFunctionData ? (
                     <SendEthButton
                       contractAddress={deployedContractData.address}
                       abi={deployedContractData.abi as Abi}
+                      objectIds={checkedItems}
+                      snapshot={snapshot}
                       functionName={registerPlayFunctionData.fn.name}
-                      value={"0.001"}
                       onWrite={(txnReceipt: TransactionReceipt) => {
                         console.log("txnReceipt", txnReceipt);
                         checkPlayerRegistered();

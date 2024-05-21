@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   17069: {
     Game: {
-      address: "0x9237E4D31a82709Aeb1Bf97082f85E385161F74F",
+      address: "0x6fccd63De0C3842514A3199296fe03488a657DE3",
       abi: [
         {
           inputs: [
@@ -548,26 +548,6 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [],
-          name: "register",
-          outputs: [],
-          stateMutability: "payable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "registerPrice",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
           inputs: [
             {
               internalType: "uint8[]",
@@ -606,19 +586,6 @@ const deployedContracts = {
             },
           ],
           name: "setPlayerSearchSize",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "price",
-              type: "uint256",
-            },
-          ],
-          name: "setRegisterPrice",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
